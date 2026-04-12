@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Growtopia Calculator</string>
+    <string name="deskripsi">Aplikasi yang akan membantumu seputar perhitungan di game Growtopia.</string>
+    <string name="about">Aplikasi ini dibuat oleh:\nRizky Argo Pradana\n607062400005\nD3IF-4801\n Aplikasi ini dibuat untuk kebutuhan penilaian Assesmen 1 mata kuliah Pemrograman Perangkat Bergerak 1.</string>
+    <string name="gambar">Gambar %s</string>
+    <string name="hitung">Hitung</string>
+</resources>
