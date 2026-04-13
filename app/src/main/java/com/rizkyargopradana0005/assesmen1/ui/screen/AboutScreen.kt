@@ -78,7 +78,7 @@ fun AboutContent(modifier: Modifier) {
                 text = stringResource(R.string.info),
                 modifier = Modifier.padding(20.dp),
                 style = MaterialTheme.typography.bodyLarge,
-                lineHeight = 24.sp, // Memberikan jarak antar baris agar enak dibaca
+                lineHeight = 24.sp,
                 color = Color.DarkGray
             )
         }
