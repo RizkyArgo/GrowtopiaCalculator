@@ -53,8 +53,10 @@ fun HarvestScreen(navController: NavHostController) {
                         )
                     }
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color(0xFF1FC41F),
+                    scrolledContainerColor = Color.Unspecified,
+                    navigationIconContentColor = Color.Unspecified,
                     titleContentColor = Color.White,
                     actionIconContentColor = Color.White
                 ),
@@ -169,7 +171,6 @@ fun HarvestContent(modifier: Modifier = Modifier) {
         }
 
         if (block != 0f) {
-            val status = if (isFarmable) "Farmable" else "Unfarmable"
             val shareMessage = stringResource(R.string.bagikanHarvest, jumlahInput, block, seed)
 
             ElevatedCard(

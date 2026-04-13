@@ -8,7 +8,6 @@ import androidx.navigation.compose.rememberNavController
 import com.rizkyargopradana0005.assesmen1.ui.screen.AboutScreen
 import com.rizkyargopradana0005.assesmen1.ui.screen.HarvestScreen
 import com.rizkyargopradana0005.assesmen1.ui.screen.MainScreen
-import com.rizkyargopradana0005.assesmen1.ui.screen.ScreenContent
 import com.rizkyargopradana0005.assesmen1.ui.screen.VendingScreen
 
 @Composable
