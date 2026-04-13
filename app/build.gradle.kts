@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.rizkyargopradana0005.mobpro1"
+    namespace = "com.rizkyargopradana0005.assesmen1"
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
@@ -12,7 +12,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.rizkyargopradana0005.mobpro1"
+        applicationId = "com.rizkyargopradana0005.assesmen1"
         minSdk = 26
         targetSdk = 36
         versionCode = 1

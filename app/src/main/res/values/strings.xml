@@ -1,7 +1,14 @@
 <resources>
-    <string name="app_name">Growtopia Calculator</string>
-    <string name="deskripsi">Aplikasi yang akan membantumu seputar perhitungan di game Growtopia.</string>
-    <string name="about">Aplikasi ini dibuat oleh:\nRizky Argo Pradana\n607062400005\nD3IF-4801\n Aplikasi ini dibuat untuk kebutuhan penilaian Assesmen 1 mata kuliah Pemrograman Perangkat Bergerak 1.</string>
-    <string name="gambar">Gambar %s</string>
+    <string name="app_name" translatable="false">Growtopia Calculator</string>
+    <string name="deskripsi" translatable="false">Aplikasi yang akan membantumu seputar perhitungan di game Growtopia.</string>
+    <string name="info" translatable="false">Aplikasi ini dibuat oleh:\nRizky Argo Pradana\n607062400005\nD3IF-4801\nAplikasi ini dibuat untuk kebutuhan penilaian Assesmen 1 mata kuliah Pemrograman Perangkat Bergerak 1.</string>
+    <string name="gambar" translatable="false">Gambar %s</string>
     <string name="hitung">Hitung</string>
+    <string name="infoharvest">Di Halaman ini kalian dapat mengetahui berapa block yang dihasilkan oleh pohon yang kalian punya</string>
+    <string name="infovending">Di Halaman ini kalian dapat memperkirakan keuntungan kalian</string>
+    <string name="invalid">Inputan salah</string>
+    <string name="bagikan">Bagikan</string>
+    <string name="bagikanHarvest">Hasil harvest %1$s Pohon:\nBlock: %2$s Block \nSeed: %3$s Seed.</string>
+    <string name="bagikanPenjualan">Rincian Penjualan:\nModal: %1$s WL\nKotor: %2$s WL\nBersih: %3$s WL</string>
+    <string name="kembali">Kembali</string>
 </resources>

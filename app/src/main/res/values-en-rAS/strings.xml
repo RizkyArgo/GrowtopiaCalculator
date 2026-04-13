@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hitung">Count</string>
+    <string name="infovending">On this page you can estimate your profits.</string>
+    <string name="invalid">Input Invalid</string>
+    <string name="bagikan">Share</string>
+    <string name="bagikanHarvest">Share</string>
+    <string name="bagikanPenjualan">Details: Spent: %1$s WL Gross:%2$s WL Clean: %3$s WL</string>
+    <string name="kembali">Back</string>
+    <string name="infoharvest">On this page you can find out how many blocks are produced by the trees you have.</string>
+</resources>
