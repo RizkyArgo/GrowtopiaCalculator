@@ -11,4 +11,5 @@
     <string name="bagikanHarvest">Hasil harvest %1$s Pohon:\nBlock: %2$s Block \nSeed: %3$s Seed.</string>
     <string name="bagikanPenjualan">Rincian Penjualan:\nModal: %1$s WL\nKotor: %2$s WL\nBersih: %3$s WL</string>
     <string name="kembali">Kembali</string>
+    <string name="transaksi">Catatan Transaksi</string>
 </resources>

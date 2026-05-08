@@ -5,11 +5,16 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -42,7 +47,7 @@ fun ScreenContent(home: Home, navController: NavHostController, modifier: Modifi
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier
-                .size(132.dp)
+                .size(100.dp)
                 .clickable {
                     when (home.nama) {
                         "Hitung Harvest" -> navController.navigate(Screen.Harvest.route)
@@ -87,15 +92,51 @@ fun MainScreen(navController: NavHostController) {
             )
         },
     ) { innerPadding ->
-        Row(
+        Column(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize(),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            ScreenContent(data[0], navController)
-            ScreenContent(data[1], navController)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                ScreenContent(data[0], navController)
+                ScreenContent(data[1], navController)
+            }
+
+            Spacer(modifier = Modifier.size(32.dp))
+
+            Button(
+                onClick = { navController.navigate("history") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 32.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(31, 196, 31, 255)
+                ),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.history),
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp),
+                        tint = Color.Unspecified
+                    )
+                    Spacer(modifier = Modifier.size(8.dp))
+                    Text(
+                        text = "Catatan Transaksi",
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
         }
     }
 }
