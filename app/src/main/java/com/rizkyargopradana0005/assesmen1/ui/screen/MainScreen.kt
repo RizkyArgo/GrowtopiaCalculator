@@ -111,7 +111,7 @@ fun MainScreen(navController: NavHostController) {
             Spacer(modifier = Modifier.size(32.dp))
 
             Button(
-                onClick = { navController.navigate("history") },
+                onClick = { navController.navigate(Screen.History.route) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 32.dp),

@@ -5,4 +5,5 @@ sealed class Screen(val route: String) {
     data object Harvest : Screen("harvestScreen")
     data object Vending : Screen("vendingScreen")
     data object About : Screen("aboutScreen")
+    data object History : Screen("historyScreen")
 }

@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.rizkyargopradana0005.assesmen1.ui.screen.AboutScreen
 import com.rizkyargopradana0005.assesmen1.ui.screen.HarvestScreen
+import com.rizkyargopradana0005.assesmen1.ui.screen.HistoryScreen
 import com.rizkyargopradana0005.assesmen1.ui.screen.MainScreen
 import com.rizkyargopradana0005.assesmen1.ui.screen.VendingScreen
 
@@ -27,6 +28,9 @@ fun SetupNavGraph(navController: NavHostController = rememberNavController()) {
         }
         composable(route = Screen.About.route) {
             AboutScreen(navController)
+        }
+        composable(route = Screen.History.route) {
+            HistoryScreen(navController)
         }
     }
 }
