@@ -20,13 +20,17 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -35,6 +39,11 @@ import androidx.navigation.NavHostController
 import com.rizkyargopradana0005.assesmen1.R
 import com.rizkyargopradana0005.assesmen1.model.Home
 import com.rizkyargopradana0005.assesmen1.navigation.Screen
+import com.rizkyargopradana0005.assesmen1.util.SettingsDataStore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import androidx.core.graphics.toColorInt
 
 @Composable
 fun ScreenContent(home: Home, navController: NavHostController, modifier: Modifier = Modifier) {
@@ -65,6 +74,11 @@ fun ScreenContent(home: Home, navController: NavHostController, modifier: Modifi
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(navController: NavHostController) {
+    val dataStore = SettingsDataStore(LocalContext.current)
+    val themeColorHex by dataStore.themeColorFlow.collectAsState("#1FC41F")
+    val currentThemeColor = Color(themeColorHex.toColorInt())
+    val listWarna = listOf("#1FC41F", "#2196F3", "#F44336", "#9C27B0")
+
     val data = listOf(
         Home("Hitung Harvest", R.drawable.tree),
         Home("Hitung Penjualan", R.drawable.vending)
@@ -73,13 +87,13 @@ fun MainScreen(navController: NavHostController) {
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    Text(text = stringResource(R.string.app_name),fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.app_name), fontWeight = FontWeight.Bold)
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(31, 196, 31, 255),
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = currentThemeColor,
                     titleContentColor = Color.White,
                     actionIconContentColor = Color.White
-                ),actions = {
+                ), actions = {
                     IconButton(onClick = {
                         navController.navigate(Screen.About.route)
                     }) {
@@ -91,6 +105,25 @@ fun MainScreen(navController: NavHostController) {
                 }
             )
         },
+        floatingActionButton = {
+            SmallFloatingActionButton(
+                onClick = {
+                    val indexSekarang = listWarna.indexOf(themeColorHex)
+                    val indexBerikutnya = (indexSekarang + 1) % listWarna.size
+                    CoroutineScope(Dispatchers.IO).launch {
+                        dataStore.saveThemeColor(listWarna[indexBerikutnya])
+                    }
+                },
+                containerColor = Color.White,
+                contentColor = currentThemeColor,
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.baseline_format_paint_24),
+                    contentDescription = null
+                )
+            }
+        }
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -116,7 +149,7 @@ fun MainScreen(navController: NavHostController) {
                     .fillMaxWidth()
                     .padding(horizontal = 32.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(31, 196, 31, 255)
+                    containerColor = currentThemeColor
                 ),
                 shape = RoundedCornerShape(8.dp)
             ) {

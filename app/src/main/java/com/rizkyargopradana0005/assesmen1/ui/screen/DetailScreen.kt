@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,20 +41,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.rizkyargopradana0005.assesmen1.R
 import com.rizkyargopradana0005.assesmen1.navigation.Screen
-import com.rizkyargopradana0005.assesmen1.ui.theme.Assesmen1Theme
+import com.rizkyargopradana0005.assesmen1.util.SettingsDataStore
 import com.rizkyargopradana0005.assesmen1.util.ViewModelFactory
+import androidx.core.graphics.toColorInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailScreen(navController: NavHostController, id: Long? = null) {
     val context = LocalContext.current
+    val dataStore = SettingsDataStore(context)
+    val themeColorHex by dataStore.themeColorFlow.collectAsState("#1FC41F")
+    val currentThemeColor = Color(themeColorHex.toColorInt())
+
     val factory = ViewModelFactory(context)
     val viewModel: DetailViewModel = viewModel(factory = factory)
 
@@ -89,7 +93,7 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color(31, 196, 31),
+                    containerColor = currentThemeColor,
                     titleContentColor = Color.White
                 ),
                 actions = {
@@ -113,6 +117,7 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
             onJenisChange = { jenisTransaksi = it },
             modifier = Modifier.padding(padding),
             isEdit = id != null,
+            themeColor = currentThemeColor,
             onSave = {
                 if (judul.isBlank() || jumlah.isBlank()) {
                     Toast.makeText(context, R.string.invalid_transaksi, Toast.LENGTH_SHORT).show()
@@ -149,7 +154,8 @@ fun FormTransaksi(
     modifier: Modifier,
     onSave: () -> Unit,
     onDelete: () -> Unit,
-    isEdit: Boolean
+    isEdit: Boolean,
+    themeColor: Color
 ) {
     val opsiBeli = stringResource(R.string.beli)
     val opsiJual = stringResource(R.string.jual)
@@ -174,7 +180,7 @@ fun FormTransaksi(
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (isBeliSelected) Color(31, 196, 31) else Color(240, 240, 240),
+                        containerColor = if (isBeliSelected) themeColor else Color(240, 240, 240),
                         contentColor = if (isBeliSelected) Color.White else Color.Gray
                     )
                 ) {
@@ -222,7 +228,7 @@ fun FormTransaksi(
                 onClick = onSave,
                 modifier = Modifier.fillMaxWidth().height(52.dp),
                 shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(31, 196, 31))
+                colors = ButtonDefaults.buttonColors(containerColor = themeColor)
             ) {
                 Text(stringResource(R.string.simpan), color = Color.White, style = MaterialTheme.typography.titleMedium)
             }
@@ -239,13 +245,5 @@ fun FormTransaksi(
                 }
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DetailScreenPreview() {
-    Assesmen1Theme {
-        DetailScreen(rememberNavController())
     }
 }

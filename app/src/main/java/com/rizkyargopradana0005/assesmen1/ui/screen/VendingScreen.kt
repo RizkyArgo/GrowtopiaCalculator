@@ -34,11 +34,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -53,17 +56,21 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.rizkyargopradana0005.assesmen1.R
 import com.rizkyargopradana0005.assesmen1.navigation.Screen
+import com.rizkyargopradana0005.assesmen1.util.SettingsDataStore
+import androidx.core.graphics.toColorInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VendingScreen(navController: NavHostController) {
+    val dataStore = SettingsDataStore(LocalContext.current)
+    val themeColorHex by dataStore.themeColorFlow.collectAsState("#1FC41F")
+    val currentThemeColor = Color(themeColorHex.toColorInt())
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -78,9 +85,10 @@ fun VendingScreen(navController: NavHostController) {
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(31, 196, 31, 255),
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = currentThemeColor,
                     titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White
                 ),
                 actions = {
                     IconButton(onClick = {
@@ -96,12 +104,15 @@ fun VendingScreen(navController: NavHostController) {
             )
         },
     ) { innerPadding ->
-        VendingContent(modifier = Modifier.padding(innerPadding))
+        VendingContent(
+            modifier = Modifier.padding(innerPadding),
+            themeColor = currentThemeColor
+        )
     }
 }
 
 @Composable
-fun VendingContent(modifier: Modifier = Modifier) {
+fun VendingContent(modifier: Modifier = Modifier, themeColor: Color) {
     var jumlahInput by rememberSaveable { mutableStateOf("") }
     var modal by rememberSaveable { mutableStateOf("") }
     var hargaInput by rememberSaveable { mutableStateOf("") }
@@ -140,7 +151,11 @@ fun VendingContent(modifier: Modifier = Modifier) {
             isError = inputError,
             shape = RoundedCornerShape(12.dp),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = themeColor,
+                focusedLabelColor = themeColor
+            )
         )
 
         OutlinedTextField(
@@ -150,7 +165,11 @@ fun VendingContent(modifier: Modifier = Modifier) {
             shape = RoundedCornerShape(12.dp),
             isError = inputError,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = themeColor,
+                focusedLabelColor = themeColor
+            )
         )
 
         OutlinedTextField(
@@ -169,7 +188,11 @@ fun VendingContent(modifier: Modifier = Modifier) {
             isError = inputError,
             shape = RoundedCornerShape(12.dp),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = themeColor,
+                focusedLabelColor = themeColor
+            )
         )
 
         Card(
@@ -181,10 +204,18 @@ fun VendingContent(modifier: Modifier = Modifier) {
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(horizontal = 8.dp)
             ) {
-                RadioButton(selected = perItem, onClick = { perItem = true })
+                RadioButton(
+                    selected = perItem,
+                    onClick = { perItem = true },
+                    colors = RadioButtonDefaults.colors(selectedColor = themeColor)
+                )
                 Text(text = "WL/Item", style = MaterialTheme.typography.bodyMedium)
                 Spacer(modifier = Modifier.width(16.dp))
-                RadioButton(selected = !perItem, onClick = { perItem = false })
+                RadioButton(
+                    selected = !perItem,
+                    onClick = { perItem = false },
+                    colors = RadioButtonDefaults.colors(selectedColor = themeColor)
+                )
                 Text(text = "Item/WL", style = MaterialTheme.typography.bodyMedium)
             }
         }
@@ -203,7 +234,7 @@ fun VendingContent(modifier: Modifier = Modifier) {
             },
             modifier = Modifier.fillMaxWidth().height(52.dp),
             shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(31, 196, 31, 255))
+            colors = ButtonDefaults.buttonColors(containerColor = themeColor)
         ) {
             Text(text = stringResource(R.string.hitung), fontWeight = FontWeight.Bold, fontSize = 16.sp)
         }
@@ -229,7 +260,7 @@ fun VendingContent(modifier: Modifier = Modifier) {
                     HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
 
                     if (profit >= 0) {
-                        ResultLine(label = "Hasil Bersih", value = "$profit WL", valueColor = Color(31, 196, 31, 255), isBold = true)
+                        ResultLine(label = "Hasil Bersih", value = "$profit WL", valueColor = themeColor, isBold = true)
                     } else {
                         ResultLine(label = "Rugi", value = "$profit WL", valueColor = Color.Red, isBold = true)
                     }
@@ -295,10 +326,4 @@ private fun shareData(context: Context, message: String) {
         putExtra(Intent.EXTRA_TEXT, message)
     }
     context.startActivity(Intent.createChooser(shareIntent, "Bagikan hasil"))
-}
-
-@Preview(showBackground = true)
-@Composable
-fun VendingPreview() {
-    VendingScreen(rememberNavController())
 }

@@ -18,18 +18,27 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.rizkyargopradana0005.assesmen1.R
+import com.rizkyargopradana0005.assesmen1.util.SettingsDataStore
+import androidx.core.graphics.toColorInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AboutScreen(navController: NavHostController) {
+    val dataStore = SettingsDataStore(LocalContext.current)
+    val themeColorHex by dataStore.themeColorFlow.collectAsState("#1FC41F")
+    val currentThemeColor = Color(themeColorHex.toColorInt())
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -47,12 +56,10 @@ fun AboutScreen(navController: NavHostController) {
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(31, 196, 31, 255),
-                    scrolledContainerColor = Color.Unspecified,
-                    navigationIconContentColor = Color.White,
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = currentThemeColor,
                     titleContentColor = Color.White,
-                    actionIconContentColor = Color.Unspecified
+                    navigationIconContentColor = Color.White
                 )
             )
         },

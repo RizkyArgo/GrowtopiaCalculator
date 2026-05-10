@@ -1,7 +1,16 @@
 package com.rizkyargopradana0005.assesmen1.ui.screen
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
@@ -10,8 +19,22 @@ import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,12 +55,16 @@ import com.rizkyargopradana0005.assesmen1.util.ViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import androidx.core.graphics.toColorInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HistoryScreen(navController: NavHostController) {
     val dataStore = SettingsDataStore(LocalContext.current)
     val showList by dataStore.layoutFlow.collectAsState(true)
+    val themeColorHex by dataStore.themeColorFlow.collectAsState("#1FC41F")
+    val currentTheme = Color(themeColorHex.toColorInt())
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -57,7 +84,7 @@ fun HistoryScreen(navController: NavHostController) {
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color(31, 196, 31),
+                    containerColor = currentTheme,
                     titleContentColor = Color.White
                 ),
                 actions = {
@@ -98,13 +125,14 @@ fun HistoryScreen(navController: NavHostController) {
         ScreenContent(
             showList = showList,
             modifier = Modifier.padding(innerPadding),
-            navController = navController
+            navController = navController,
+            themeColor = currentTheme
         )
     }
 }
 
 @Composable
-fun ScreenContent(showList: Boolean, modifier: Modifier = Modifier, navController: NavHostController) {
+fun ScreenContent(showList: Boolean, modifier: Modifier = Modifier, navController: NavHostController, themeColor: Color) {
     val context = LocalContext.current
     val factory = ViewModelFactory(context)
     val viewModel: MainViewModel = viewModel(factory = factory)
@@ -122,7 +150,7 @@ fun ScreenContent(showList: Boolean, modifier: Modifier = Modifier, navControlle
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(data) {
-                    ListItem(transaksi = it) {
+                    ListItem(transaksi = it, themeColor = themeColor) {
                         navController.navigate(Screen.EditTransaksi.withId(it.id))
                     }
                 }
@@ -136,7 +164,7 @@ fun ScreenContent(showList: Boolean, modifier: Modifier = Modifier, navControlle
                 contentPadding = PaddingValues(16.dp, 16.dp, 16.dp, 84.dp)
             ) {
                 items(data) {
-                    GridItem(transaksi = it) {
+                    GridItem(transaksi = it, themeColor = themeColor) {
                         navController.navigate(Screen.EditTransaksi.withId(it.id))
                     }
                 }
@@ -146,7 +174,7 @@ fun ScreenContent(showList: Boolean, modifier: Modifier = Modifier, navControlle
 }
 
 @Composable
-fun ListItem(transaksi: Transaksi, onClick: () -> Unit) {
+fun ListItem(transaksi: Transaksi, themeColor: Color, onClick: () -> Unit) {
     val isBeli = transaksi.jenis == stringResource(R.string.beli)
     Card(
         modifier = Modifier.fillMaxWidth().clickable { onClick() },
@@ -170,7 +198,7 @@ fun ListItem(transaksi: Transaksi, onClick: () -> Unit) {
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 Surface(
-                    color = if (isBeli) Color(31, 196, 31, 40) else Color(244, 67, 54, 40),
+                    color = if (isBeli) themeColor.copy(alpha = 0.15f) else Color(244, 67, 54, 40),
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Text(
@@ -178,7 +206,7 @@ fun ListItem(transaksi: Transaksi, onClick: () -> Unit) {
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Black,
-                        color = if (isBeli) Color(31, 196, 31) else Color(244, 67, 54)
+                        color = if (isBeli) themeColor else Color(244, 67, 54)
                     )
                 }
             }
@@ -193,7 +221,7 @@ fun ListItem(transaksi: Transaksi, onClick: () -> Unit) {
 }
 
 @Composable
-fun GridItem(transaksi: Transaksi, onClick: () -> Unit) {
+fun GridItem(transaksi: Transaksi, themeColor: Color, onClick: () -> Unit) {
     val isBeli = transaksi.jenis == stringResource(R.string.beli)
     Card(
         modifier = Modifier.fillMaxWidth().clickable { onClick() },
@@ -214,7 +242,7 @@ fun GridItem(transaksi: Transaksi, onClick: () -> Unit) {
                 fontWeight = FontWeight.Bold
             )
             Surface(
-                color = if (isBeli) Color(31, 196, 31, 40) else Color(244, 67, 54, 40),
+                color = if (isBeli) themeColor.copy(alpha = 0.15f) else Color(244, 67, 54, 40),
                 shape = RoundedCornerShape(8.dp)
             ) {
                 Text(
@@ -222,7 +250,7 @@ fun GridItem(transaksi: Transaksi, onClick: () -> Unit) {
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Black,
-                    color = if (isBeli) Color(31, 196, 31) else Color(244, 67, 54)
+                    color = if (isBeli) themeColor else Color(244, 67, 54)
                 )
             }
             Text(

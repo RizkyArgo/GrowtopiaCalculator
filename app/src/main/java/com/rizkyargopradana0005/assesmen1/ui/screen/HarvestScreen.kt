@@ -2,8 +2,17 @@ package com.rizkyargopradana0005.assesmen1.ui.screen
 
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -14,9 +23,34 @@ import androidx.compose.material.icons.filled.Eco
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,17 +59,21 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.rizkyargopradana0005.assesmen1.R
 import com.rizkyargopradana0005.assesmen1.navigation.Screen
+import com.rizkyargopradana0005.assesmen1.util.SettingsDataStore
+import androidx.core.graphics.toColorInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HarvestScreen(navController: NavHostController) {
+    val dataStore = SettingsDataStore(LocalContext.current)
+    val themeColorHex by dataStore.themeColorFlow.collectAsState("#1FC41F")
+    val currentThemeColor = Color(themeColorHex.toColorInt())
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -53,11 +91,10 @@ fun HarvestScreen(navController: NavHostController) {
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF1FC41F),
-                    scrolledContainerColor = Color.Unspecified,
-                    navigationIconContentColor = Color.Unspecified,
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = currentThemeColor,
                     titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White,
                     actionIconContentColor = Color.White
                 ),
                 actions = {
@@ -71,12 +108,15 @@ fun HarvestScreen(navController: NavHostController) {
             )
         },
     ) { innerPadding ->
-        HarvestContent(modifier = Modifier.padding(innerPadding))
+        HarvestContent(
+            modifier = Modifier.padding(innerPadding),
+            themeColor = currentThemeColor
+        )
     }
 }
 
 @Composable
-fun HarvestContent(modifier: Modifier = Modifier) {
+fun HarvestContent(modifier: Modifier = Modifier, themeColor: Color) {
     var jumlahInput by rememberSaveable { mutableStateOf("") }
     var inputError by rememberSaveable { mutableStateOf(false) }
     var isFarmable by rememberSaveable { mutableStateOf(true) }
@@ -84,7 +124,6 @@ fun HarvestContent(modifier: Modifier = Modifier) {
     var seed by rememberSaveable { mutableIntStateOf(0) }
 
     val context = LocalContext.current
-    val customGreen = Color(0xFF1FC41F)
 
     Column(
         modifier = modifier
@@ -95,7 +134,7 @@ fun HarvestContent(modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Surface(
-            color = customGreen.copy(alpha = 0.1f),
+            color = themeColor.copy(alpha = 0.1f),
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -103,12 +142,12 @@ fun HarvestContent(modifier: Modifier = Modifier) {
                 modifier = Modifier.padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(Icons.Default.Eco, contentDescription = null, tint = customGreen)
+                Icon(Icons.Default.Eco, contentDescription = null, tint = themeColor)
                 Spacer(Modifier.width(12.dp))
                 Text(
                     text = stringResource(R.string.infoharvest),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = customGreen,
+                    color = themeColor,
                     fontWeight = FontWeight.Medium
                 )
             }
@@ -131,7 +170,11 @@ fun HarvestContent(modifier: Modifier = Modifier) {
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Done
             ),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = themeColor,
+                focusedLabelColor = themeColor
+            )
         )
 
         Card(
@@ -144,12 +187,20 @@ fun HarvestContent(modifier: Modifier = Modifier) {
                 modifier = Modifier.padding(8.dp).fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
-                RadioButton(selected = isFarmable, onClick = { isFarmable = true })
+                RadioButton(
+                    selected = isFarmable,
+                    onClick = { isFarmable = true },
+                    colors = RadioButtonDefaults.colors(selectedColor = themeColor)
+                )
                 Text("Farmable", style = MaterialTheme.typography.bodyMedium)
 
                 Spacer(Modifier.width(24.dp))
 
-                RadioButton(selected = !isFarmable, onClick = { isFarmable = false })
+                RadioButton(
+                    selected = !isFarmable,
+                    onClick = { isFarmable = false },
+                    colors = RadioButtonDefaults.colors(selectedColor = themeColor)
+                )
                 Text("Unfarmable", style = MaterialTheme.typography.bodyMedium)
             }
         }
@@ -165,7 +216,7 @@ fun HarvestContent(modifier: Modifier = Modifier) {
             },
             modifier = Modifier.fillMaxWidth().height(56.dp),
             shape = RoundedCornerShape(16.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = customGreen)
+            colors = ButtonDefaults.buttonColors(containerColor = themeColor)
         ) {
             Text(stringResource(R.string.hitung), fontSize = 16.sp, fontWeight = FontWeight.Bold)
         }
@@ -186,9 +237,9 @@ fun HarvestContent(modifier: Modifier = Modifier) {
                     Text("Hasil Kalkulasi", style = MaterialTheme.typography.labelLarge, color = Color.Gray)
                     Spacer(Modifier.height(12.dp))
 
-                    ResultRow(label = "Total Block", value = "${block.toInt()} Block", color = customGreen)
+                    ResultRow(label = "Total Block", value = "${block.toInt()} Block", color = themeColor)
                     HorizontalDivider(Modifier.padding(vertical = 8.dp), thickness = 0.5.dp)
-                    ResultRow(label = "Estimasi Seed", value = "$seed Seed", color = customGreen)
+                    ResultRow(label = "Estimasi Seed", value = "$seed Seed", color = themeColor)
 
                     Spacer(Modifier.height(20.dp))
 
@@ -196,7 +247,8 @@ fun HarvestContent(modifier: Modifier = Modifier) {
                         onClick = { shareData(context, shareMessage) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
-                        border = ButtonDefaults.outlinedButtonBorder.copy(width = 1.5.dp)
+                        border = BorderStroke(1.5.dp, themeColor),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = themeColor)
                     ) {
                         Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(Modifier.width(8.dp))
@@ -231,11 +283,4 @@ private fun shareData(context: Context, message: String) {
         putExtra(Intent.EXTRA_TEXT, message)
     }
     context.startActivity(Intent.createChooser(shareIntent, "Bagikan hasil"))
-}
-
-@Preview(showBackground = true)
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
-@Composable
-fun HarvestPreview() {
-    HarvestScreen(rememberNavController())
 }
