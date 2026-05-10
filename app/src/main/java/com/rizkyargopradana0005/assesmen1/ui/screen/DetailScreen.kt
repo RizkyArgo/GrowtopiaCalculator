@@ -60,6 +60,7 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
     var judul by remember { mutableStateOf("") }
     var jumlah by remember { mutableStateOf("") }
     var jenisTransaksi by remember { mutableStateOf("Beli") }
+    var showDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(id) {
         if (id == null) return@LaunchedEffect
@@ -122,13 +123,18 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
                 }
             },
             onDelete = {
-                if (id != null) {
-                    viewModel.delete(id)
-                    navController.popBackStack()
-                    Toast.makeText(context, R.string.sukses, Toast.LENGTH_SHORT).show()
-                }
+                showDialog = true
             }
         )
+
+        if (id != null && showDialog) {
+            DisplayAlertDialog(
+                onDismissRequest = { showDialog = false}) {
+                showDialog = false
+                viewModel.delete(id)
+                navController.popBackStack()
+            }
+        }
     }
 }
 

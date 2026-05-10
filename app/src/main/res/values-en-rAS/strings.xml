@@ -21,4 +21,9 @@
     <string name="kosong">Transaction List is Empty</string>
     <string name="hapus">Delete</string>
     <string name="sukses">Deleted!</string>
+    <string name="pesan_hapus">Delete this Transaction Logs?</string>
+    <string name="tomobl_hapus">Delete</string>
+    <string name="tombol_batal">Cancel</string>
+    <string name="list">List View</string>
+    <string name="grid">Grid View</string>
 </resources>
