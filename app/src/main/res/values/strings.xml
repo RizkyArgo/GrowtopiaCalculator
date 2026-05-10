@@ -7,13 +7,14 @@
     <string name="infoharvest">Di Halaman ini kalian dapat mengetahui berapa block yang dihasilkan oleh pohon yang kalian punya</string>
     <string name="infovending">Di Halaman ini kalian dapat memperkirakan keuntungan kalian</string>
     <string name="invalid">Inputan salah</string>
+    <string name="invalid_transaksi">Input tidak boleh kosong</string>
     <string name="bagikan">Bagikan</string>
     <string name="bagikanHarvest">Hasil harvest %1$s Pohon:\nBlock: %2$s Block \nSeed: %3$s Seed.</string>
     <string name="bagikanPenjualan">Rincian Penjualan:\nModal: %1$s WL\nKotor: %2$s WL\nBersih: %3$s WL</string>
     <string name="kembali">Kembali</string>
     <string name="transaksi">Catatan Transaksi</string>
     <string name="judul">Judul Transaksi</string>
-    <string name="nominal">Nominal(WL)</string>
+    <string name="nominal">Nominal</string>
     <string name="tambah_transaksi">Tambah Transaksi</string>
     <string name="edit_transaksi">Edit Transaksi</string>
     <string name="beli">Beli</string>
@@ -21,4 +22,6 @@
     <string name="jenis">Jenis Transaksi</string>
     <string name="simpan">Simpan</string>
     <string name="kosong">Daftar Transaksi Kosong</string>
+    <string name="hapus">Hapus</string>
+    <string name="sukses">Berhasil dihapus</string>
 </resources>

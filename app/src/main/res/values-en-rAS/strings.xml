@@ -3,6 +3,7 @@
     <string name="hitung">Count</string>
     <string name="infovending">On this page you can estimate your profits.</string>
     <string name="invalid">Input Invalid</string>
+    <string name="invalid_transaksi">You need to fill those column!</string>
     <string name="bagikan">Share</string>
     <string name="bagikanHarvest">Share</string>
     <string name="bagikanPenjualan">Details: Spent: %1$s WL Gross:%2$s WL Clean: %3$s WL</string>
@@ -10,7 +11,7 @@
     <string name="infoharvest">On this page you can find out how many blocks are produced by the trees you have.</string>
     <string name="transaksi">Transaction Logs</string>
     <string name="judul">Transaction Title</string>
-    <string name="nominal">Nominal (WL)</string>
+    <string name="nominal">Nominal</string>
     <string name="tambah_transaksi">Add Transaction</string>
     <string name="edit_transaksi">Edit Transaction</string>
     <string name="beli">Buy</string>
@@ -18,4 +19,6 @@
     <string name="jenis">Transaction Type</string>
     <string name="simpan">Save</string>
     <string name="kosong">Transaction List is Empty</string>
+    <string name="hapus">Delete</string>
+    <string name="sukses">Deleted!</string>
 </resources>

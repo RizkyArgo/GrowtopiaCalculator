@@ -1,11 +1,13 @@
 package com.rizkyargopradana0005.assesmen1.ui.screen
 
-import android.content.res.Configuration
+import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -19,6 +21,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -31,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -44,16 +48,20 @@ import androidx.navigation.compose.rememberNavController
 import com.rizkyargopradana0005.assesmen1.R
 import com.rizkyargopradana0005.assesmen1.navigation.Screen
 import com.rizkyargopradana0005.assesmen1.ui.theme.Assesmen1Theme
+import com.rizkyargopradana0005.assesmen1.util.ViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailScreen(navController: NavHostController, id: Long? = null) {
+    val context = LocalContext.current
+    val factory = ViewModelFactory(context)
+    val viewModel: DetailViewModel = viewModel(factory = factory)
+
     var judul by remember { mutableStateOf("") }
     var jumlah by remember { mutableStateOf("") }
     var jenisTransaksi by remember { mutableStateOf("Beli") }
-    val viewModel: MainViewModel = viewModel()
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(id) {
         if (id == null) return@LaunchedEffect
         val data = viewModel.getTransaksi(id) ?: return@LaunchedEffect
         judul = data.judul
@@ -65,13 +73,10 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    if (id == null)
                     Text(
-                        text = stringResource(R.string.tambah_transaksi),
+                        text = if (id == null) stringResource(R.string.tambah_transaksi) else stringResource(R.string.edit_transaksi),
                         fontWeight = FontWeight.Bold
                     )
-                    else
-                        Text(stringResource(R.string.edit_transaksi))
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
@@ -82,23 +87,21 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(31, 196, 31, 255),
-                    titleContentColor = Color.White,
-                    actionIconContentColor = Color.White
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color(31, 196, 31),
+                    titleContentColor = Color.White
                 ),
                 actions = {
-                    IconButton(onClick = {
-                        navController.navigate(Screen.About.route)
-                    }) {
+                    IconButton(onClick = { navController.navigate(Screen.About.route) }) {
                         Icon(
                             imageVector = Icons.Outlined.Info,
                             contentDescription = stringResource(R.string.info),
+                            tint = Color.White
                         )
                     }
                 }
             )
-        },
+        }
     ) { padding ->
         FormTransaksi(
             title = judul,
@@ -107,7 +110,24 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
             onJumlahChange = { jumlah = it },
             jenisTransaksi = jenisTransaksi,
             onJenisChange = { jenisTransaksi = it },
-            modifier = Modifier.padding(padding)
+            modifier = Modifier.padding(padding),
+            isEdit = id != null,
+            onSave = {
+                if (judul.isBlank() || jumlah.isBlank()) {
+                    Toast.makeText(context, R.string.invalid_transaksi, Toast.LENGTH_SHORT).show()
+                } else {
+                    if (id == null) viewModel.insert(judul, jumlah, jenisTransaksi)
+                    else viewModel.update(id, judul, jumlah, jenisTransaksi)
+                    navController.popBackStack()
+                }
+            },
+            onDelete = {
+                if (id != null) {
+                    viewModel.delete(id)
+                    navController.popBackStack()
+                    Toast.makeText(context, R.string.sukses, Toast.LENGTH_SHORT).show()
+                }
+            }
         )
     }
 }
@@ -120,87 +140,103 @@ fun FormTransaksi(
     onJumlahChange: (String) -> Unit,
     jenisTransaksi: String,
     onJenisChange: (String) -> Unit,
-    modifier: Modifier
+    modifier: Modifier,
+    onSave: () -> Unit,
+    onDelete: () -> Unit,
+    isEdit: Boolean
 ) {
     val opsiBeli = stringResource(R.string.beli)
     val opsiJual = stringResource(R.string.jual)
+
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(24.dp),
+        modifier = modifier.fillMaxSize().padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(
-                text = stringResource(R.string.jenis),
+                text = "Tipe Transaksi",
                 style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary
+                color = Color.Gray
             )
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                val opsi = listOf(opsiBeli,opsiJual)
-                opsi.forEach { teks ->
-                    val isSelected = jenisTransaksi == teks
-                    Button(
-                        onClick = { onJenisChange(teks) },
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (isSelected) Color(31, 196, 31) else Color(240, 240, 240),
-                            contentColor = if (isSelected) Color.White else Color.Gray
-                        )
-                    ) {
-                        Text(text = teks, fontWeight = FontWeight.Bold)
-                    }
+                val isBeliSelected = jenisTransaksi == opsiBeli
+                Button(
+                    onClick = { onJenisChange(opsiBeli) },
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (isBeliSelected) Color(31, 196, 31) else Color(240, 240, 240),
+                        contentColor = if (isBeliSelected) Color.White else Color.Gray
+                    )
+                ) {
+                    Text(text = opsiBeli, fontWeight = FontWeight.Bold)
+                }
+
+                val isJualSelected = jenisTransaksi == opsiJual
+                Button(
+                    onClick = { onJenisChange(opsiJual) },
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (isJualSelected) Color(33, 150, 243) else Color(240, 240, 240),
+                        contentColor = if (isJualSelected) Color.White else Color.Gray
+                    )
+                ) {
+                    Text(text = opsiJual, fontWeight = FontWeight.Bold)
                 }
             }
         }
 
         OutlinedTextField(
             value = title,
-            onValueChange = { onTitleChange(it) },
-            label = { Text(text = stringResource(R.string.judul)) },
+            onValueChange = onTitleChange,
+            label = { Text(stringResource(R.string.judul)) },
             singleLine = true,
             shape = RoundedCornerShape(12.dp),
-            keyboardOptions = KeyboardOptions(
-                capitalization = KeyboardCapitalization.Words,
-                imeAction = ImeAction.Next
-            ),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words, imeAction = ImeAction.Next)
         )
 
         OutlinedTextField(
             value = nominal,
-            onValueChange = { onJumlahChange(it) },
-            label = { Text(text = stringResource(R.string.nominal)) },
+            onValueChange = onJumlahChange,
+            label = { Text(stringResource(R.string.nominal)) },
+            suffix = { Text(" WL", fontWeight = FontWeight.Bold, color = Color(0xFFDAA520)) },
             singleLine = true,
             shape = RoundedCornerShape(12.dp),
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Done
-            ),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done)
         )
 
-        Button(
-            onClick = { },
-            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(31, 196, 31))
-        ) {
-            Text(
-                text = "Simpan",
-                style = MaterialTheme.typography.titleMedium,
-                color = Color.White
-            )
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Button(
+                onClick = onSave,
+                modifier = Modifier.fillMaxWidth().height(52.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(31, 196, 31))
+            ) {
+                Text(stringResource(R.string.simpan), color = Color.White, style = MaterialTheme.typography.titleMedium)
+            }
+
+            if (isEdit) {
+                OutlinedButton(
+                    onClick = onDelete,
+                    modifier = Modifier.fillMaxWidth().height(52.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    border = BorderStroke(1.dp, Color(244, 67, 54)),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(244, 67, 54))
+                ) {
+                    Text(stringResource(R.string.hapus), style = MaterialTheme.typography.titleMedium)
+                }
+            }
         }
     }
 }
 
 @Preview(showBackground = true)
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
 @Composable
 fun DetailScreenPreview() {
     Assesmen1Theme {
