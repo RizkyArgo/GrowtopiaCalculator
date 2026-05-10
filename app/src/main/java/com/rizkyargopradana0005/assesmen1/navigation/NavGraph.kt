@@ -2,9 +2,11 @@ package com.rizkyargopradana0005.assesmen1.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.rizkyargopradana0005.assesmen1.ui.screen.AboutScreen
 import com.rizkyargopradana0005.assesmen1.ui.screen.DetailScreen
 import com.rizkyargopradana0005.assesmen1.ui.screen.HarvestScreen
@@ -35,6 +37,15 @@ fun SetupNavGraph(navController: NavHostController = rememberNavController()) {
         }
         composable(route = Screen.Transaksi.route) {
             DetailScreen(navController)
+        }
+        composable(
+            route = Screen.EditTransaksi.route,
+            arguments = listOf(
+                navArgument(KEY_ID_TRANSAKSI) { type = NavType.LongType }
+            )
+        ) { navBackStackEntry ->
+            val id = navBackStackEntry.arguments?.getLong(KEY_ID_TRANSAKSI)
+            DetailScreen(navController, id)
         }
     }
 }

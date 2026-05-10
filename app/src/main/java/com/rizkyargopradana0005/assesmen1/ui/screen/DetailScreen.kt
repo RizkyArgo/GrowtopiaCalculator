@@ -24,6 +24,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,6 +38,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.rizkyargopradana0005.assesmen1.R
@@ -45,19 +47,31 @@ import com.rizkyargopradana0005.assesmen1.ui.theme.Assesmen1Theme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetailScreen(navController: NavHostController) {
+fun DetailScreen(navController: NavHostController, id: Long? = null) {
     var judul by remember { mutableStateOf("") }
     var jumlah by remember { mutableStateOf("") }
     var jenisTransaksi by remember { mutableStateOf("Beli") }
+    val viewModel: MainViewModel = viewModel()
+
+    LaunchedEffect(Unit) {
+        if (id == null) return@LaunchedEffect
+        val data = viewModel.getTransaksi(id) ?: return@LaunchedEffect
+        judul = data.judul
+        jumlah = data.jumlah
+        jenisTransaksi = data.jenis
+    }
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
+                    if (id == null)
                     Text(
-                        text = stringResource(R.string.app_name),
+                        text = stringResource(R.string.tambah_transaksi),
                         fontWeight = FontWeight.Bold
                     )
+                    else
+                        Text(stringResource(R.string.edit_transaksi))
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {

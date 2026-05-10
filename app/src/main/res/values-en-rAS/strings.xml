@@ -12,8 +12,10 @@
     <string name="judul">Transaction Title</string>
     <string name="nominal">Nominal (WL)</string>
     <string name="tambah_transaksi">Add Transaction</string>
+    <string name="edit_transaksi">Edit Transaction</string>
     <string name="beli">Buy</string>
     <string name="jual">Sell</string>
     <string name="jenis">Transaction Type</string>
     <string name="simpan">Save</string>
+    <string name="kosong">Transaction List is Empty</string>
 </resources>

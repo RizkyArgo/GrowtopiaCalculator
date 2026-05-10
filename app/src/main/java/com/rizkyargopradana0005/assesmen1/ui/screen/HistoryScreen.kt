@@ -1,9 +1,14 @@
 package com.rizkyargopradana0005.assesmen1.ui.screen
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Info
@@ -11,6 +16,7 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -23,9 +29,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.rizkyargopradana0005.assesmen1.R
+import com.rizkyargopradana0005.assesmen1.model.Transaksi
 import com.rizkyargopradana0005.assesmen1.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -75,21 +84,72 @@ fun HistoryScreen(navController: NavHostController) {
                 elevation = FloatingActionButtonDefaults.elevation(0.dp)
             ) {
                 Icon(
-                    painterResource(id = R.drawable.tambah),
+                    painter = painterResource(id = R.drawable.tambah),
                     contentDescription = stringResource(R.string.tambah_transaksi),
                     tint = Color.Unspecified
                 )
             }
         }
     ) { innerPadding ->
+        ScreenContent(
+            modifier = Modifier.padding(innerPadding),
+            navController = navController
+        )
+    }
+}
+
+@Composable
+fun ScreenContent(modifier: Modifier = Modifier, navController: NavHostController) {
+    val viewModel: MainViewModel = viewModel()
+    val data = viewModel.data
+
+    if (data.isEmpty()) {
         Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize(),
+            modifier = modifier.fillMaxSize().padding(16.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "Daftar Transaksi Kosong")
+            Text(text = stringResource(R.string.kosong))
         }
+    } else {
+        LazyColumn(
+            modifier = modifier.fillMaxSize(),
+            contentPadding = PaddingValues(bottom = 84.dp)
+        ) {
+            items(data) {
+                ListItem(transaksi = it) {
+                    navController.navigate(Screen.EditTransaksi.withId(it.id))
+                }
+                HorizontalDivider()
+            }
+        }
+    }
+}
+
+@Composable
+fun ListItem(transaksi: Transaksi, onClick: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            text = transaksi.judul,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = transaksi.jumlah,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+        Text(
+            text = transaksi.jenis,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }
