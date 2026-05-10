@@ -9,6 +9,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -18,8 +20,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.rizkyargopradana0005.assesmen1.R
 import com.rizkyargopradana0005.assesmen1.navigation.Screen
@@ -62,6 +66,21 @@ fun HistoryScreen(navController: NavHostController) {
                 }
             )
         },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    navController.navigate(Screen.Transaksi.route)
+                },
+                containerColor = Color.Transparent,
+                elevation = FloatingActionButtonDefaults.elevation(0.dp)
+            ) {
+                Icon(
+                    painterResource(id = R.drawable.tambah),
+                    contentDescription = stringResource(R.string.tambah_transaksi),
+                    tint = Color.Unspecified
+                )
+            }
+        }
     ) { innerPadding ->
         Column(
             modifier = Modifier

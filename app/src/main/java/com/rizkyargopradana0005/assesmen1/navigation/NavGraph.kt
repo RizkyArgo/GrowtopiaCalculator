@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.rizkyargopradana0005.assesmen1.ui.screen.AboutScreen
+import com.rizkyargopradana0005.assesmen1.ui.screen.DetailScreen
 import com.rizkyargopradana0005.assesmen1.ui.screen.HarvestScreen
 import com.rizkyargopradana0005.assesmen1.ui.screen.HistoryScreen
 import com.rizkyargopradana0005.assesmen1.ui.screen.MainScreen
@@ -31,6 +32,9 @@ fun SetupNavGraph(navController: NavHostController = rememberNavController()) {
         }
         composable(route = Screen.History.route) {
             HistoryScreen(navController)
+        }
+        composable(route = Screen.Transaksi.route) {
+            DetailScreen(navController)
         }
     }
 }

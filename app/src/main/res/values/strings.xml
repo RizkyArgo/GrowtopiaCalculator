@@ -12,4 +12,11 @@
     <string name="bagikanPenjualan">Rincian Penjualan:\nModal: %1$s WL\nKotor: %2$s WL\nBersih: %3$s WL</string>
     <string name="kembali">Kembali</string>
     <string name="transaksi">Catatan Transaksi</string>
+    <string name="judul">Judul Transaksi</string>
+    <string name="nominal">Nominal(WL)</string>
+    <string name="tambah_transaksi">Tambah Transaksi</string>
+    <string name="beli">Beli</string>
+    <string name="jual">Jual</string>
+    <string name="jenis">Jenis Transaksi</string>
+    <string name="simpan">Simpan</string>
 </resources>
