@@ -48,6 +48,8 @@ import com.rizkyargopradana0005.assesmen1.R
 import com.rizkyargopradana0005.assesmen1.navigation.Screen
 import com.rizkyargopradana0005.assesmen1.util.SettingsDataStore
 import androidx.core.graphics.toColorInt
+import com.rizkyargopradana0005.assesmen1.model.User
+import com.rizkyargopradana0005.assesmen1.network.UserDataStore
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,8 +58,13 @@ fun DetailScreen(navController: NavHostController, id: String? = null) {
     val dataStore = SettingsDataStore(context)
     val themeColorHex by dataStore.themeColorFlow.collectAsState("#1FC41F")
     val currentThemeColor = Color(themeColorHex.toColorInt())
+    val userDataStore = UserDataStore(LocalContext.current)
+    val user by userDataStore.userFlow.collectAsState(initial = User())
 
-    val viewModel: DetailViewModel = viewModel()
+    val viewModel: DetailViewModel = viewModel(factory = DetailViewModel.DetailViewModelFactory(
+        context
+    )
+    )
 
     var judul by remember { mutableStateOf("") }
     var harga by remember { mutableStateOf("") }
@@ -120,9 +127,19 @@ fun DetailScreen(navController: NavHostController, id: String? = null) {
                 if (judul.isBlank() || harga.isBlank()) {
                     Toast.makeText(context, R.string.invalid_transaksi, Toast.LENGTH_SHORT).show()
                 } else {
-                    if (id == null) viewModel.insert(judul, harga, jenisTransaksi)
-                    else viewModel.update(id, judul, harga, jenisTransaksi)
-                    navController.popBackStack()
+                    if (id == null) {
+                        viewModel.insert(judul, harga, jenisTransaksi, user.email) { success ->
+                            if (success) {
+                                Toast.makeText(context, "Berhasil disimpan", Toast.LENGTH_SHORT).show()
+                                navController.popBackStack()
+                            } else {
+                                Toast.makeText(context, "Gagal simpan ke server", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    } else {
+                        viewModel.update(id, judul, harga, jenisTransaksi)
+                        navController.popBackStack()
+                    }
                 }
             },
             onDelete = {
