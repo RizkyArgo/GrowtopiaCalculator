@@ -50,7 +50,9 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.rizkyargopradana0005.assesmen1.BuildConfig
 import com.rizkyargopradana0005.assesmen1.R
 import com.rizkyargopradana0005.assesmen1.model.Home
+import com.rizkyargopradana0005.assesmen1.model.User
 import com.rizkyargopradana0005.assesmen1.navigation.Screen
+import com.rizkyargopradana0005.assesmen1.network.UserDataStore
 import com.rizkyargopradana0005.assesmen1.util.SettingsDataStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -83,7 +85,7 @@ fun ScreenContent(home: Home, navController: NavHostController, modifier: Modifi
     }
 }
 
-suspend fun signIn(context: Context, dataStore: SettingsDataStore, scope: CoroutineScope) {
+suspend fun signIn(context: Context, dataStore: UserDataStore) {
     val googleIdOption = GetGoogleIdOption.Builder()
         .setFilterByAuthorizedAccounts(false)
         .setServerClientId(BuildConfig.API_KEY)
@@ -96,16 +98,16 @@ suspend fun signIn(context: Context, dataStore: SettingsDataStore, scope: Corout
     try {
         val credentialManager = CredentialManager.create(context)
         val result = credentialManager.getCredential(context, request)
-        handleSignIn(result, dataStore, scope)
+        Log.d("SIGN-IN", "Credential didapatkan, memproses...")
+        handleSignIn(result, dataStore)
     } catch (e: GetCredentialException) {
         Log.e("SIGN-IN", "Error: ${e.errorMessage}")
     }
 }
 
-fun handleSignIn(
+private suspend fun handleSignIn(
     result: GetCredentialResponse,
-    dataStore: SettingsDataStore,
-    scope: CoroutineScope
+    dataStore: UserDataStore
 ) {
     val credential = result.credential
     if (credential is CustomCredential &&
@@ -113,10 +115,10 @@ fun handleSignIn(
     ) {
         try {
             val googleId = GoogleIdTokenCredential.createFrom(credential.data)
+            val nama = googleId.displayName ?: ""
             val email = googleId.id
-            scope.launch {
-                dataStore.saveEmail(email)
-            }
+            val photoUrl = googleId.profilePictureUri.toString()
+            dataStore.saveData(User(nama,email,photoUrl))
         } catch (e: Exception) {
             Log.e("SIGN-IN", "Error parsing token: ${e.message}")
         }
@@ -129,9 +131,11 @@ fun handleSignIn(
 @Composable
 fun MainScreen(navController: NavHostController) {
     val context = LocalContext.current
-    val dataStore = SettingsDataStore(context)
-    val themeColorHex by dataStore.themeColorFlow.collectAsState("#1FC41F")
-    val userEmail by dataStore.emailFlow.collectAsState(initial = null)
+    val userDataStore = UserDataStore(context)
+    val user by userDataStore.userFlow.collectAsState(User())
+    Log.d("DEBUG_MAIN", "User yang terbaca : $user")
+    val settingsdataStore = SettingsDataStore(context)
+    val themeColorHex by settingsdataStore.themeColorFlow.collectAsState("#1FC41F")
 
     val currentThemeColor = Color(themeColorHex.toColorInt())
     val listWarna = listOf("#1FC41F", "#2196F3", "#F44336", "#9C27B0")
@@ -169,7 +173,7 @@ fun MainScreen(navController: NavHostController) {
                     val indexSekarang = listWarna.indexOf(themeColorHex)
                     val indexBerikutnya = (indexSekarang + 1) % listWarna.size
                     CoroutineScope(Dispatchers.IO).launch {
-                        dataStore.saveThemeColor(listWarna[indexBerikutnya])
+                        settingsdataStore.saveThemeColor(listWarna[indexBerikutnya])
                     }
                 },
                 containerColor = Color.White,
@@ -203,7 +207,7 @@ fun MainScreen(navController: NavHostController) {
 
             Button(
                 onClick = {
-                    if (userEmail.isNullOrEmpty()) {
+                    if (user.email.isEmpty()) {
                         navController.navigate(Screen.Login.route)
                     } else {
                         navController.navigate(Screen.History.route)

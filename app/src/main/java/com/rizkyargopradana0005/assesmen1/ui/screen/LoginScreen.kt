@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import androidx.navigation.NavHostController
 import com.rizkyargopradana0005.assesmen1.navigation.Screen
+import com.rizkyargopradana0005.assesmen1.network.UserDataStore
 import com.rizkyargopradana0005.assesmen1.util.SettingsDataStore
 import kotlinx.coroutines.launch
 
@@ -34,8 +35,9 @@ import kotlinx.coroutines.launch
 @Composable
 fun LoginScreen(navController: NavHostController) {
     val context = LocalContext.current
-    val dataStore = SettingsDataStore(context)
-    val themeColorHex by dataStore.themeColorFlow.collectAsState("#1FC41F")
+    val userDataStore = UserDataStore(context)
+    val settingsDataStore = SettingsDataStore(context)
+    val themeColorHex by settingsDataStore.themeColorFlow.collectAsState("#1FC41F")
     val currentTheme = Color(themeColorHex.toColorInt())
     val scope = rememberCoroutineScope()
 
@@ -67,7 +69,7 @@ fun LoginScreen(navController: NavHostController) {
             Button(
                 onClick = {
                     scope.launch {
-                        signIn(context, dataStore, scope)
+                        signIn(context, userDataStore)
                         navController.navigate(Screen.History.route) {
                             popUpTo(Screen.Login.route) { inclusive = true }
                         }
