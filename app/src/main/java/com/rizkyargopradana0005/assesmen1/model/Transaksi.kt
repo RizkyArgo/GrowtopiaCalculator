@@ -1,10 +1,11 @@
 package com.rizkyargopradana0005.assesmen1.model
+import com.squareup.moshi.Json
 
 data class Transaksi(
-    val id: String = "",
-    val judul: String,
-    val harga: String,
-    val jenis: String,
-    val imageUrl: String,
-    val email: String
+    @Json(name = "id") val id: String = "",
+    @Json(name = "judul") val judul: String,
+    @Json(name = "harga") val harga: String,
+    @Json(name = "jenis") val jenis: String,
+    @Json(name = "imageUrl") val imageUrl: String,
+    @Json(name = "email") val email: String = "unknown"
 )
