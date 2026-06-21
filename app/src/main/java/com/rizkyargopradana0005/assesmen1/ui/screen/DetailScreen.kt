@@ -1,5 +1,7 @@
 package com.rizkyargopradana0005.assesmen1.ui.screen
 
+import android.graphics.Bitmap
+import android.util.Base64
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -50,17 +52,12 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import java.io.ByteArrayOutputStream
 import com.rizkyargopradana0005.assesmen1.R
 import com.rizkyargopradana0005.assesmen1.model.User
 import com.rizkyargopradana0005.assesmen1.navigation.Screen
 import com.rizkyargopradana0005.assesmen1.network.UserDataStore
 import com.rizkyargopradana0005.assesmen1.util.SettingsDataStore
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.util.Base64
-import androidx.compose.foundation.Image
-import androidx.compose.ui.graphics.asImageBitmap
+import java.io.ByteArrayOutputStream
 
 
 @OptIn(ExperimentalMaterial3Api::class)
