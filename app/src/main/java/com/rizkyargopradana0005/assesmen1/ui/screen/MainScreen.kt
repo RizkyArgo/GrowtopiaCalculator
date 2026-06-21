@@ -1,5 +1,7 @@
 package com.rizkyargopradana0005.assesmen1.ui.screen
 
+import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -35,7 +37,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.toColorInt
+import androidx.credentials.CredentialManager
+import androidx.credentials.CustomCredential
+import androidx.credentials.GetCredentialRequest
+import androidx.credentials.GetCredentialResponse
+import androidx.credentials.exceptions.GetCredentialException
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.rizkyargopradana0005.assesmen1.BuildConfig
 import com.rizkyargopradana0005.assesmen1.R
 import com.rizkyargopradana0005.assesmen1.model.Home
 import com.rizkyargopradana0005.assesmen1.navigation.Screen
@@ -43,13 +55,11 @@ import com.rizkyargopradana0005.assesmen1.util.SettingsDataStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import androidx.core.graphics.toColorInt
-import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun ScreenContent(home: Home, navController: NavHostController, modifier: Modifier = Modifier) {
-    val viewModel: MainViewModel= viewModel()
-    Column (
+    val viewModel: MainViewModel = viewModel()
+    Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
     ) {
@@ -73,11 +83,56 @@ fun ScreenContent(home: Home, navController: NavHostController, modifier: Modifi
     }
 }
 
+suspend fun signIn(context: Context, dataStore: SettingsDataStore, scope: CoroutineScope) {
+    val googleIdOption = GetGoogleIdOption.Builder()
+        .setFilterByAuthorizedAccounts(false)
+        .setServerClientId(BuildConfig.API_KEY)
+        .build()
+
+    val request = GetCredentialRequest.Builder()
+        .addCredentialOption(googleIdOption)
+        .build()
+
+    try {
+        val credentialManager = CredentialManager.create(context)
+        val result = credentialManager.getCredential(context, request)
+        handleSignIn(result, dataStore, scope)
+    } catch (e: GetCredentialException) {
+        Log.e("SIGN-IN", "Error: ${e.errorMessage}")
+    }
+}
+
+fun handleSignIn(
+    result: GetCredentialResponse,
+    dataStore: SettingsDataStore,
+    scope: CoroutineScope
+) {
+    val credential = result.credential
+    if (credential is CustomCredential &&
+        credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
+    ) {
+        try {
+            val googleId = GoogleIdTokenCredential.createFrom(credential.data)
+            val email = googleId.id
+            scope.launch {
+                dataStore.saveEmail(email)
+            }
+        } catch (e: Exception) {
+            Log.e("SIGN-IN", "Error parsing token: ${e.message}")
+        }
+    } else {
+        Log.e("SIGN-IN", "Unrecognized credential type.")
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(navController: NavHostController) {
-    val dataStore = SettingsDataStore(LocalContext.current)
+    val context = LocalContext.current
+    val dataStore = SettingsDataStore(context)
     val themeColorHex by dataStore.themeColorFlow.collectAsState("#1FC41F")
+    val userEmail by dataStore.emailFlow.collectAsState(initial = null)
+
     val currentThemeColor = Color(themeColorHex.toColorInt())
     val listWarna = listOf("#1FC41F", "#2196F3", "#F44336", "#9C27B0")
 
@@ -85,6 +140,7 @@ fun MainScreen(navController: NavHostController) {
         Home("Hitung Harvest", R.drawable.tree),
         Home("Hitung Penjualan", R.drawable.vending)
     )
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -146,7 +202,13 @@ fun MainScreen(navController: NavHostController) {
             Spacer(modifier = Modifier.size(32.dp))
 
             Button(
-                onClick = { navController.navigate(Screen.History.route) },
+                onClick = {
+                    if (userEmail.isNullOrEmpty()) {
+                        navController.navigate(Screen.Login.route)
+                    } else {
+                        navController.navigate(Screen.History.route)
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 32.dp),

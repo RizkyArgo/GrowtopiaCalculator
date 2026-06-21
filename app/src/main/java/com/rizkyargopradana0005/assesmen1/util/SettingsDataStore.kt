@@ -14,12 +14,18 @@ val Context.dataStore : DataStore<Preferences> by preferencesDataStore(
     name = "settings_preferences"
 )
 
+
 class SettingsDataStore(private val context: Context) {
+
+
+
     companion object {
         private val IS_LIST = booleanPreferencesKey("is_list")
         private val THEME_COLOR_KEY = stringPreferencesKey("theme_color")
+        private val EMAIL_KEY = stringPreferencesKey("user_email")
     }
-
+    val emailFlow: Flow<String?> = context.dataStore.data.map { preferences ->
+        preferences[EMAIL_KEY] }
     val layoutFlow: Flow<Boolean> = context.dataStore.data.map { preferences ->
         preferences[IS_LIST] ?: true
     }
@@ -27,6 +33,12 @@ class SettingsDataStore(private val context: Context) {
     suspend fun saveLayout(isList: Boolean) {
         context.dataStore.edit { preferences ->
             preferences[IS_LIST] = isList
+        }
+    }
+
+    suspend fun saveEmail(email: String) {
+        context.dataStore.edit { preferences ->
+            preferences[EMAIL_KEY] = email
         }
     }
         val themeColorFlow: Flow<String> = context.dataStore.data.map { preferences ->

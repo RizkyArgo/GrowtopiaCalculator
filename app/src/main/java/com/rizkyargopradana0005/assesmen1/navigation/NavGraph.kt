@@ -30,6 +30,9 @@ fun SetupNavGraph(navController: NavHostController = rememberNavController()) {
         composable(route = Screen.History.route) {
             HistoryScreen(navController)
         }
+        composable(route = Screen.Login.route) {
+            LoginScreen(navController)
+        }
         composable(route = Screen.Transaksi.route) {
             DetailScreen(navController)
         }

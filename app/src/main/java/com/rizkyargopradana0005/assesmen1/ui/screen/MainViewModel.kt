@@ -15,11 +15,8 @@ class MainViewModel : ViewModel() {
     private val _data = MutableStateFlow<List<Transaksi>>(emptyList())
     val data: StateFlow<List<Transaksi>> = _data.asStateFlow()
 
-    init {
-        retrieveData()
-    }
 
-    private fun retrieveData() {
+    private fun retrieveData(userEmail: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val result = TransaksiApi.service.getTransaksi()

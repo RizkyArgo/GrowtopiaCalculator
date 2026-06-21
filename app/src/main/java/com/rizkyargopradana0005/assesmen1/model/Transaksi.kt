@@ -5,5 +5,6 @@ data class Transaksi(
     val judul: String,
     val harga: String,
     val jenis: String,
-    val imageUrl: String
+    val imageUrl: String,
+    val email: String
 )

@@ -11,4 +11,5 @@ sealed class Screen(val route: String) {
     data object EditTransaksi : Screen("detailScreen/{$KEY_ID_TRANSAKSI}") {
         fun withId(id: String) = "detailScreen/$id"
     }
+    data object Login: Screen("loginScreen")
 }

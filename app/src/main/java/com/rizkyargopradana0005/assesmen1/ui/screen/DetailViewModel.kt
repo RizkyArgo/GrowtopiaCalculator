@@ -30,7 +30,8 @@ class DetailViewModel(private val context: Context) : ViewModel() {
                     judul = judul,
                     harga = harga,
                     jenis = jenis,
-                    imageUrl = ""
+                    imageUrl = "",
+                    email = ""
                 )
                 TransaksiApi.service.addTransaksi(newTransaksi)
             } catch (e: Exception) {
@@ -47,7 +48,8 @@ class DetailViewModel(private val context: Context) : ViewModel() {
                     judul = judul,
                     harga = harga,
                     jenis = jenis,
-                    imageUrl = ""
+                    imageUrl = "",
+                    email = ""
                 )
                 TransaksiApi.service.updateTransaksi(id, updatedTransaksi)
             } catch (e: Exception) {
