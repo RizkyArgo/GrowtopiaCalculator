@@ -1,5 +1,7 @@
 package com.rizkyargopradana0005.assesmen1.ui.screen
 
+import android.graphics.Bitmap
+import android.util.Base64
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -50,17 +52,12 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import java.io.ByteArrayOutputStream
 import com.rizkyargopradana0005.assesmen1.R
 import com.rizkyargopradana0005.assesmen1.model.User
 import com.rizkyargopradana0005.assesmen1.navigation.Screen
 import com.rizkyargopradana0005.assesmen1.network.UserDataStore
 import com.rizkyargopradana0005.assesmen1.util.SettingsDataStore
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.util.Base64
-import androidx.compose.foundation.Image
-import androidx.compose.ui.graphics.asImageBitmap
+import java.io.ByteArrayOutputStream
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -282,15 +279,9 @@ fun FormTransaksi(
 }
 fun bitmapToBase64(bitmap: Bitmap): String {
     return ByteArrayOutputStream().use { outputStream ->
-        // 1. Resize ke resolusi 200x200 (sudah cukup untuk thumbnail di HP)
         val resized = Bitmap.createScaledBitmap(bitmap, 200, 200, false)
-
-        // 2. Gunakan format JPEG dengan kualitas 10%
         resized.compress(Bitmap.CompressFormat.JPEG, 10, outputStream)
-
         val bytes = outputStream.toByteArray()
-
-        // 3. Encode dengan NO_WRAP agar tidak ada karakter baris baru (\n) yang merusak JSON
         return@use Base64.encodeToString(bytes, Base64.NO_WRAP)
     }
 }

@@ -1,6 +1,7 @@
 package com.rizkyargopradana0005.assesmen1.ui.screen
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,7 +10,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -61,7 +61,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import coil.request.ImageRequest
 import com.rizkyargopradana0005.assesmen1.R
 import com.rizkyargopradana0005.assesmen1.model.Transaksi
 import com.rizkyargopradana0005.assesmen1.model.User
@@ -76,9 +75,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun HistoryScreen(navController: NavHostController) {
     val viewModel: MainViewModel = viewModel()
-    LaunchedEffect(true) {
-        viewModel.retrieveData()
-    }
+
     val context = LocalContext.current
     val settingsDataStore = SettingsDataStore(context)
     val userDataStore = UserDataStore(context)
@@ -88,6 +85,13 @@ fun HistoryScreen(navController: NavHostController) {
     val currentTheme = Color(themeColorHex.toColorInt())
     val user by userDataStore.userFlow.collectAsState(initial = User())
 
+    LaunchedEffect(user.email) {
+        if (user.email.isNotEmpty()) {
+            viewModel.retrieveData(user.email)
+        } else {
+            viewModel.clearData()
+        }
+    }
     var showProfileDialog by remember { mutableStateOf(false) }
 
 
@@ -171,6 +175,7 @@ fun HistoryScreen(navController: NavHostController) {
                 user = user,
                 onDismiss = { showProfileDialog = false },
                 onLogout = {
+                    viewModel.clearData()
                     CoroutineScope(Dispatchers.IO).launch {
                         userDataStore.saveData(
                             User(
@@ -181,7 +186,10 @@ fun HistoryScreen(navController: NavHostController) {
                         )
                     }
                     showProfileDialog = false
-                    navController.navigate(Screen.Home.route) { popUpTo(0) { inclusive = true } }
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(0) { inclusive = true }
+                        launchSingleTop = true
+                    }
                 }
             )
         }
@@ -192,15 +200,53 @@ fun HistoryScreen(navController: NavHostController) {
 fun ProfileDialog(user: User, onDismiss: () -> Unit, onLogout: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Profil Pengguna") },
+        title = {
+            Text(
+                "Profil Pengguna",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+        },
         text = {
-            Column {
-                Text("Nama: ${user.name.ifEmpty { "Tidak ada nama" }}")
-                Text("Email: ${user.email.ifEmpty { "Belum login" }}")
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                AsyncImage(
+                    model = user.photoUrl.ifEmpty { R.drawable.brokenimage_ },
+                    contentDescription = "Foto Profil",
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(RoundedCornerShape(50.dp))
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                    contentScale = ContentScale.Crop
+                )
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = user.name.ifEmpty { "Tidak ada nama" },
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        text = user.email.ifEmpty { "Belum login" },
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.Gray
+                    )
+                }
             }
         },
-        confirmButton = { TextButton(onClick = onLogout) { Text("Logout", color = Color.Red) } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Tutup") } }
+        confirmButton = {
+            TextButton(onClick = onLogout) {
+                Text("Logout", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Bold)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Tutup")
+            }
+        },
+        shape = RoundedCornerShape(28.dp)
     )
 }
 

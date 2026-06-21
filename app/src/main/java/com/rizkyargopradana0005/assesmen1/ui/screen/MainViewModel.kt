@@ -18,13 +18,21 @@ class MainViewModel : ViewModel() {
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
+    fun clearData() {
+        _data.value = emptyList()
+        _isLoading.value = false
+    }
 
-    fun retrieveData() {
+    fun retrieveData(userEmail: String) {
+        if (userEmail.isEmpty()) return
+
         viewModelScope.launch(Dispatchers.IO) {
             _isLoading.value = true
             try {
                 val result = TransaksiApi.service.getTransaksi()
-                _data.value = result
+                val filteredData = result.filter { it.email == userEmail }
+
+                _data.value = filteredData
                 Log.d("MainViewModel", "Success: $result")
             } catch (e: Exception) {
                 Log.e("MainViewModel", "Failure: ${e.message}")
