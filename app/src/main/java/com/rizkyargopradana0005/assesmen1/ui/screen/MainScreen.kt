@@ -44,9 +44,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.core.graphics.toColorInt
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun ScreenContent(home: Home, navController: NavHostController, modifier: Modifier = Modifier) {
+    val viewModel: MainViewModel= viewModel()
     Column (
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier

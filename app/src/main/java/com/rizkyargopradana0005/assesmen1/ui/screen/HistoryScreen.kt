@@ -51,7 +51,6 @@ import com.rizkyargopradana0005.assesmen1.R
 import com.rizkyargopradana0005.assesmen1.model.Transaksi
 import com.rizkyargopradana0005.assesmen1.navigation.Screen
 import com.rizkyargopradana0005.assesmen1.util.SettingsDataStore
-import com.rizkyargopradana0005.assesmen1.util.ViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -133,9 +132,7 @@ fun HistoryScreen(navController: NavHostController) {
 
 @Composable
 fun ScreenContent(showList: Boolean, modifier: Modifier = Modifier, navController: NavHostController, themeColor: Color) {
-    val context = LocalContext.current
-    val factory = ViewModelFactory(context)
-    val viewModel: MainViewModel = viewModel(factory = factory)
+    val viewModel: MainViewModel = viewModel()
     val data by viewModel.data.collectAsState()
 
     if (data.isEmpty()) {
@@ -211,7 +208,7 @@ fun ListItem(transaksi: Transaksi, themeColor: Color, onClick: () -> Unit) {
                 }
             }
             Text(
-                text = "${transaksi.jumlah} WL",
+                text = "${transaksi.harga} WL",
                 color = Color(234, 168, 0),
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 18.sp
@@ -254,7 +251,7 @@ fun GridItem(transaksi: Transaksi, themeColor: Color, onClick: () -> Unit) {
                 )
             }
             Text(
-                text = "${transaksi.jumlah} WL",
+                text = "${transaksi.harga} WL",
                 color = Color(234, 168, 0),
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 16.sp

@@ -1,23 +1,33 @@
 package com.rizkyargopradana0005.assesmen1.ui.screen
+
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.rizkyargopradana0005.assesmen1.database.TransaksiDao
 import com.rizkyargopradana0005.assesmen1.model.Transaksi
-import kotlinx.coroutines.flow.SharingStarted
+import com.rizkyargopradana0005.assesmen1.network.TransaksiApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import android.util.Log
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.asStateFlow
 
-class MainViewModel(dao: TransaksiDao): ViewModel() {
-    val data: StateFlow<List<Transaksi>> = dao.getTransaksi().stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(),
-        initialValue = emptyList()
-    )
+class MainViewModel : ViewModel() {
+    private val _data = MutableStateFlow<List<Transaksi>>(emptyList())
+    val data: StateFlow<List<Transaksi>> = _data.asStateFlow()
 
-    fun Factory(dao: TransaksiDao): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return MainViewModel(dao) as T
+    init {
+        retrieveData()
+    }
+
+    private fun retrieveData() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val result = TransaksiApi.service.getTransaksi()
+                Log.d("MainViewModel", "Success: $result")
+                _data.value = result
+            } catch (e: Exception) {
+                Log.e("MainViewModel", "Failure: ${e.message}")
+            }
         }
     }
 }

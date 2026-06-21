@@ -7,12 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.rizkyargopradana0005.assesmen1.ui.screen.AboutScreen
-import com.rizkyargopradana0005.assesmen1.ui.screen.DetailScreen
-import com.rizkyargopradana0005.assesmen1.ui.screen.HarvestScreen
-import com.rizkyargopradana0005.assesmen1.ui.screen.HistoryScreen
-import com.rizkyargopradana0005.assesmen1.ui.screen.MainScreen
-import com.rizkyargopradana0005.assesmen1.ui.screen.VendingScreen
+import com.rizkyargopradana0005.assesmen1.ui.screen.*
 
 @Composable
 fun SetupNavGraph(navController: NavHostController = rememberNavController()) {
@@ -41,10 +36,10 @@ fun SetupNavGraph(navController: NavHostController = rememberNavController()) {
         composable(
             route = Screen.EditTransaksi.route,
             arguments = listOf(
-                navArgument(KEY_ID_TRANSAKSI) { type = NavType.LongType }
+                navArgument(KEY_ID_TRANSAKSI) { type = NavType.StringType }
             )
         ) { navBackStackEntry ->
-            val id = navBackStackEntry.arguments?.getLong(KEY_ID_TRANSAKSI)
+            val id = navBackStackEntry.arguments?.getString(KEY_ID_TRANSAKSI)
             DetailScreen(navController, id)
         }
     }

@@ -47,22 +47,20 @@ import androidx.navigation.NavHostController
 import com.rizkyargopradana0005.assesmen1.R
 import com.rizkyargopradana0005.assesmen1.navigation.Screen
 import com.rizkyargopradana0005.assesmen1.util.SettingsDataStore
-import com.rizkyargopradana0005.assesmen1.util.ViewModelFactory
 import androidx.core.graphics.toColorInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetailScreen(navController: NavHostController, id: Long? = null) {
+fun DetailScreen(navController: NavHostController, id: String? = null) {
     val context = LocalContext.current
     val dataStore = SettingsDataStore(context)
     val themeColorHex by dataStore.themeColorFlow.collectAsState("#1FC41F")
     val currentThemeColor = Color(themeColorHex.toColorInt())
 
-    val factory = ViewModelFactory(context)
-    val viewModel: DetailViewModel = viewModel(factory = factory)
+    val viewModel: DetailViewModel = viewModel()
 
     var judul by remember { mutableStateOf("") }
-    var jumlah by remember { mutableStateOf("") }
+    var harga by remember { mutableStateOf("") }
     var jenisTransaksi by remember { mutableStateOf("Beli") }
     var showDialog by remember { mutableStateOf(false) }
 
@@ -70,7 +68,7 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
         if (id == null) return@LaunchedEffect
         val data = viewModel.getTransaksi(id) ?: return@LaunchedEffect
         judul = data.judul
-        jumlah = data.jumlah
+        harga = data.harga
         jenisTransaksi = data.jenis
     }
 
@@ -111,19 +109,19 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
         FormTransaksi(
             title = judul,
             onTitleChange = { judul = it },
-            nominal = jumlah,
-            onJumlahChange = { jumlah = it },
+            nominal = harga,
+            onhargaChange = { harga = it },
             jenisTransaksi = jenisTransaksi,
             onJenisChange = { jenisTransaksi = it },
             modifier = Modifier.padding(padding),
             isEdit = id != null,
             themeColor = currentThemeColor,
             onSave = {
-                if (judul.isBlank() || jumlah.isBlank()) {
+                if (judul.isBlank() || harga.isBlank()) {
                     Toast.makeText(context, R.string.invalid_transaksi, Toast.LENGTH_SHORT).show()
                 } else {
-                    if (id == null) viewModel.insert(judul, jumlah, jenisTransaksi)
-                    else viewModel.update(id, judul, jumlah, jenisTransaksi)
+                    if (id == null) viewModel.insert(judul, harga, jenisTransaksi)
+                    else viewModel.update(id, judul, harga, jenisTransaksi)
                     navController.popBackStack()
                 }
             },
@@ -148,7 +146,7 @@ fun FormTransaksi(
     title: String,
     onTitleChange: (String) -> Unit,
     nominal: String,
-    onJumlahChange: (String) -> Unit,
+    onhargaChange: (String) -> Unit,
     jenisTransaksi: String,
     onJenisChange: (String) -> Unit,
     modifier: Modifier,
@@ -214,7 +212,7 @@ fun FormTransaksi(
 
         OutlinedTextField(
             value = nominal,
-            onValueChange = onJumlahChange,
+            onValueChange = onhargaChange,
             label = { Text(stringResource(R.string.nominal)) },
             suffix = { Text(" WL", fontWeight = FontWeight.Bold, color = Color(0xFFDAA520)) },
             singleLine = true,

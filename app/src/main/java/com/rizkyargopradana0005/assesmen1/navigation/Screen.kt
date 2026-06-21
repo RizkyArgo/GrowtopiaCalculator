@@ -9,6 +9,6 @@ sealed class Screen(val route: String) {
     data object History : Screen("historyScreen")
     data object Transaksi : Screen("detailScreen")
     data object EditTransaksi : Screen("detailScreen/{$KEY_ID_TRANSAKSI}") {
-        fun withId(id: Long) = "detailScreen/$id"
+        fun withId(id: String) = "detailScreen/$id"
     }
 }
