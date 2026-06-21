@@ -1,7 +1,10 @@
 package com.rizkyargopradana0005.assesmen1.ui.screen
 
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,8 +36,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -42,14 +47,21 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.toColorInt
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import java.io.ByteArrayOutputStream
 import com.rizkyargopradana0005.assesmen1.R
-import com.rizkyargopradana0005.assesmen1.navigation.Screen
-import com.rizkyargopradana0005.assesmen1.util.SettingsDataStore
-import androidx.core.graphics.toColorInt
 import com.rizkyargopradana0005.assesmen1.model.User
+import com.rizkyargopradana0005.assesmen1.navigation.Screen
 import com.rizkyargopradana0005.assesmen1.network.UserDataStore
+import com.rizkyargopradana0005.assesmen1.util.SettingsDataStore
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.util.Base64
+import androidx.compose.foundation.Image
+import androidx.compose.ui.graphics.asImageBitmap
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,15 +73,19 @@ fun DetailScreen(navController: NavHostController, id: String? = null) {
     val userDataStore = UserDataStore(LocalContext.current)
     val user by userDataStore.userFlow.collectAsState(initial = User())
 
-    val viewModel: DetailViewModel = viewModel(factory = DetailViewModel.DetailViewModelFactory(
-        context
-    )
-    )
+    val viewModel: DetailViewModel = viewModel(factory = DetailViewModel.DetailViewModelFactory(context))
 
     var judul by remember { mutableStateOf("") }
     var harga by remember { mutableStateOf("") }
     var jenisTransaksi by remember { mutableStateOf("Beli") }
     var showDialog by remember { mutableStateOf(false) }
+    var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
+
+    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
+        if (bitmap != null){
+            imageBitmap = bitmap
+        }
+    }
 
     LaunchedEffect(id) {
         if (id == null) return@LaunchedEffect
@@ -123,12 +139,17 @@ fun DetailScreen(navController: NavHostController, id: String? = null) {
             modifier = Modifier.padding(padding),
             isEdit = id != null,
             themeColor = currentThemeColor,
+            imageBitmap = imageBitmap,
+            onPickImage = {
+                cameraLauncher.launch(null)
+            },
             onSave = {
                 if (judul.isBlank() || harga.isBlank()) {
                     Toast.makeText(context, R.string.invalid_transaksi, Toast.LENGTH_SHORT).show()
                 } else {
+                    val imageBase64 = imageBitmap?.let { bitmapToBase64(it) } ?: ""
                     if (id == null) {
-                        viewModel.insert(judul, harga, jenisTransaksi, user.email) { success ->
+                        viewModel.insert(judul, harga, jenisTransaksi, user.email, imageBase64) { success ->
                             if (success) {
                                 Toast.makeText(context, "Berhasil disimpan", Toast.LENGTH_SHORT).show()
                                 navController.popBackStack()
@@ -137,19 +158,16 @@ fun DetailScreen(navController: NavHostController, id: String? = null) {
                             }
                         }
                     } else {
-                        viewModel.update(id, judul, harga, jenisTransaksi)
+                        viewModel.update(id, judul, harga, jenisTransaksi, imageBase64)
                         navController.popBackStack()
                     }
                 }
             },
-            onDelete = {
-                showDialog = true
-            }
+            onDelete = { showDialog = true }
         )
 
         if (id != null && showDialog) {
-            DisplayAlertDialog(
-                onDismissRequest = { showDialog = false}) {
+            DisplayAlertDialog(onDismissRequest = { showDialog = false }) {
                 showDialog = false
                 viewModel.delete(id)
                 navController.popBackStack()
@@ -170,7 +188,9 @@ fun FormTransaksi(
     onSave: () -> Unit,
     onDelete: () -> Unit,
     isEdit: Boolean,
-    themeColor: Color
+    themeColor: Color,
+    imageBitmap: Bitmap?,
+    onPickImage: () -> Unit
 ) {
     val opsiBeli = stringResource(R.string.beli)
     val opsiJual = stringResource(R.string.jual)
@@ -179,16 +199,22 @@ fun FormTransaksi(
         modifier = modifier.fillMaxSize().padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+            imageBitmap?.let {
+                Image(
+                    bitmap = it.asImageBitmap(),
+                    contentDescription = "Preview",
+                    modifier = Modifier.height(150.dp).padding(bottom = 8.dp)
+                )
+            }
+            OutlinedButton(onClick = onPickImage, modifier = Modifier.fillMaxWidth()) {
+                Text(if (imageBitmap == null) "Ambil Foto Transaksi" else "Ubah Foto")
+            }
+        }
+
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(
-                text = "Tipe Transaksi",
-                style = MaterialTheme.typography.labelLarge,
-                color = Color.Gray
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
+            Text(text = "Tipe Transaksi", style = MaterialTheme.typography.labelLarge, color = Color.Gray)
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 val isBeliSelected = jenisTransaksi == opsiBeli
                 Button(
                     onClick = { onJenisChange(opsiBeli) },
@@ -198,9 +224,7 @@ fun FormTransaksi(
                         containerColor = if (isBeliSelected) themeColor else Color(240, 240, 240),
                         contentColor = if (isBeliSelected) Color.White else Color.Gray
                     )
-                ) {
-                    Text(text = opsiBeli, fontWeight = FontWeight.Bold)
-                }
+                ) { Text(text = opsiBeli, fontWeight = FontWeight.Bold) }
 
                 val isJualSelected = jenisTransaksi == opsiJual
                 Button(
@@ -211,9 +235,7 @@ fun FormTransaksi(
                         containerColor = if (isJualSelected) Color(33, 150, 243) else Color(240, 240, 240),
                         contentColor = if (isJualSelected) Color.White else Color.Gray
                     )
-                ) {
-                    Text(text = opsiJual, fontWeight = FontWeight.Bold)
-                }
+                ) { Text(text = opsiJual, fontWeight = FontWeight.Bold) }
             }
         }
 
@@ -244,9 +266,7 @@ fun FormTransaksi(
                 modifier = Modifier.fillMaxWidth().height(52.dp),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = themeColor)
-            ) {
-                Text(stringResource(R.string.simpan), color = Color.White, style = MaterialTheme.typography.titleMedium)
-            }
+            ) { Text(stringResource(R.string.simpan), color = Color.White, style = MaterialTheme.typography.titleMedium) }
 
             if (isEdit) {
                 OutlinedButton(
@@ -255,10 +275,22 @@ fun FormTransaksi(
                     shape = RoundedCornerShape(12.dp),
                     border = BorderStroke(1.dp, Color(244, 67, 54)),
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(244, 67, 54))
-                ) {
-                    Text(stringResource(R.string.hapus), style = MaterialTheme.typography.titleMedium)
-                }
+                ) { Text(stringResource(R.string.hapus), style = MaterialTheme.typography.titleMedium) }
             }
         }
+    }
+}
+fun bitmapToBase64(bitmap: Bitmap): String {
+    return ByteArrayOutputStream().use { outputStream ->
+        // 1. Resize ke resolusi 200x200 (sudah cukup untuk thumbnail di HP)
+        val resized = Bitmap.createScaledBitmap(bitmap, 200, 200, false)
+
+        // 2. Gunakan format JPEG dengan kualitas 10%
+        resized.compress(Bitmap.CompressFormat.JPEG, 10, outputStream)
+
+        val bytes = outputStream.toByteArray()
+
+        // 3. Encode dengan NO_WRAP agar tidak ada karakter baris baru (\n) yang merusak JSON
+        return@use Base64.encodeToString(bytes, Base64.NO_WRAP)
     }
 }

@@ -23,7 +23,7 @@ class DetailViewModel(private val context: Context) : ViewModel() {
         }
     }
 
-    fun insert(judul: String, harga: String, jenis: String, email: String, onResult: (Boolean) -> Unit) {
+    fun insert(judul: String, harga: String, jenis: String, email: String,image: String, onResult: (Boolean) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val newTransaksi = Transaksi(
@@ -31,7 +31,7 @@ class DetailViewModel(private val context: Context) : ViewModel() {
                     judul = judul,
                     harga = harga,
                     jenis = jenis,
-                    imageUrl = "",
+                    imageUrl = image,
                     email = email
                 )
 
@@ -47,7 +47,7 @@ class DetailViewModel(private val context: Context) : ViewModel() {
         }
     }
 
-    fun update(id: String, judul: String, harga: String, jenis: String) {
+    fun update(id: String, judul: String, harga: String, jenis: String, image: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val updatedTransaksi = Transaksi(
@@ -55,7 +55,7 @@ class DetailViewModel(private val context: Context) : ViewModel() {
                     judul = judul,
                     harga = harga,
                     jenis = jenis,
-                    imageUrl = "",
+                    imageUrl = image,
                     email = ""
                 )
                 TransaksiApi.service.updateTransaksi(id, updatedTransaksi)
